@@ -1,0 +1,25 @@
+{
+  "name": "demo-app",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Shaun Underwood <shaun@sunderwood.co.uk>"
+  ],
+  "license": "ISC",
+  "moduleType": [],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.6",
+    "angular": "angularjs#~1.4.9",
+    "jquery": "~2.2.0",
+    "angular-ui-router": "^0.2.17"
+  }
+}

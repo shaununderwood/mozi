@@ -1,0 +1,253 @@
+<html>
+<head>
+  <link rel="stylesheet" href="vendor/bootstrap/dist/css/bootstrap.css">
+
+  <link rel="stylesheet" href="css/styles.css">
+
+  <title>Lawso</title>
+
+</head>
+<body ng-app="app" ng-controller="Layout as layout">
+
+
+<div ui-view></div>
+
+
+<script type="text/ng-template" id="loggedout-main.html">
+  <div class="vertical-center">
+    <div class="container">
+
+      <form>
+        <div class="row">
+          <div class="col-xs-12">
+            <h1 class="text-center">LAWZO</h1>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-xs-offset-4 col-xs-4">
+            <div class="text-center">
+              <h3>email</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-xs-offset-4 col-xs-4">
+            <input class="form-control input-group-lg" type="text" ng-model="ctrl.model.email" autofocus/>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-xs-offset-4 col-xs-4">
+            <div class="text-center">
+              <h3>password</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-xs-offset-4 col-xs-4">
+            <input class="form-control input-group-lg" type="password" ng-model="ctrl.model.password" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-xs-offset-4 col-xs-4">
+            <div class="text-center">
+              &nbsp;
+            </div>
+          </div>
+        </div>
+
+
+        <div class="row">
+          <div class="col-xs-4"></div>
+          <div class="col-xs-4">
+            <div class="pull-left ">
+              <a href="#">Forgotten Password</a>
+            </div>
+            <div class="pull-right">
+              <a ui-sref="loggedin" class="btn btn-lg btn-warning" >Log In</a>
+            </div>
+          </div>
+          <div class="col-xs-4"></div>
+        </div>
+
+        <div class="row">
+          <div class="col-xs-12"></div>
+        </div>
+        <div class="col-xs-12"></div>
+      </form>
+    </div>
+  </div>
+
+</script>
+
+<script type="text/ng-template" id="loggedin-main.html">
+<div class="row row-adjustment text-center">
+  <div class="col-xs-2">
+    <nav class="navbar">
+      <div style="background-color: black">
+
+        <header class="profile-menu-item"
+                ng-click="gotoState('loggedin.myprofile');"
+                ng-class="{selected:selected==='loggedin.myprofile'}">
+          <div style="height: 200px; padding-top:30px">
+            <img class="img-circle" src="img/default-profile-image.png" />
+          </div>
+          <p>
+            <span><b>Sam Smith</b></span>
+            <br>
+            <span class="text-muted">Manager</span>
+          </p>
+        </header>
+
+        <section>
+            <ul class="menu">
+              <li class="menu-item" ng-click="gotoState('loggedin.groups');"          ng-class="{selected:selected==='loggedin.groups'}">GROUPS</li>
+              <li class="menu-item" ng-click="gotoState('loggedin.timesheet');"       ng-class="{selected:selected==='loggedin.timesheet'}">TIMESHEET</li>
+              <li class="menu-item" ng-click="gotoState('loggedin.administration');"  ng-class="{selected:selected==='loggedin.administration'}">ADMINISTRATION</li>
+            </ul>
+        </section>
+
+        <footer style="bottom:1px; position: absolute; text-align: center; width:100%">
+          <ul class="menu">
+            <li class="menu-item" ng-click="logout();">LOGOUT</li>
+          </ul>
+        </footer>
+
+      </div>
+    </nav>
+  </div>
+
+  <div class="col-xs-10">
+    <div ui-view></div>
+  </div>
+
+</div>
+</script>
+
+<script type="text/ng-template" id="loggedin-group.html">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="text-center">
+          <h1>Group</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="loggedin-timesheet.html">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="text-center">
+          <h1>Timesheet</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="loggedin-administration.html">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="text-center">
+          <h1>Administration</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="loggedin-myprofile.html">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="text-center">
+          <h1>My Profile</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script src="vendor/jquery/dist/jquery.js"></script>
+<script src="vendor/angular/angular.js"></script>
+<script src="vendor/angular-ui-router/release/angular-ui-router.js"></script>
+
+
+<script>
+  angular
+    .module( 'app', [ 'ui.router'])
+    .controller( 'Layout', function Layout( $scope, $state){
+
+        $scope.logout = function( ){
+          $state.go( 'loggedout');
+        };
+
+        $scope.gotoState = function( targetState){
+          $scope.selected = targetState;
+          $state.go( targetState);
+        };
+
+      })
+    .config( function( $stateProvider, $urlRouterProvider) {
+      'use strict';
+      //
+      // For any unmatched url, redirect to /state1
+      $urlRouterProvider.otherwise( "/" );
+
+      $stateProvider
+        .state('loggedout', {
+          url: "/",
+          templateProvider: function ( $templateCache) {
+            return $templateCache.get( 'loggedout-main.html');
+          }})
+        .state('loggedin', {
+          url: "/main",
+          templateProvider: function ( $templateCache) {
+            return $templateCache.get( 'loggedin-main.html');
+          }})
+        .state('loggedin.groups', {
+          url: "/main/groups",
+          templateProvider: function ( $templateCache) {
+            return $templateCache.get( 'loggedin-group.html');
+          }})
+        .state('loggedin.timesheet', {
+          url: "/main/timesheet",
+          templateProvider: function ( $templateCache) {
+            return $templateCache.get( 'loggedin-timesheet.html');
+          }})
+        .state('loggedin.administration', {
+          url: "/main/administration",
+          templateProvider: function ( $templateCache) {
+            return $templateCache.get( 'loggedin-administration.html');
+          }})
+        .state('loggedin.user', {
+          url: "/main/user",
+          templateProvider: function ( $templateCache) {
+            return $templateCache.get( 'loggedin-user.html');
+          }})
+        .state('loggedin.myprofile', {
+          url: "/main/myprofile",
+          templateProvider: function ( $templateCache) {
+            return $templateCache.get( 'loggedin-myprofile.html');
+          }})
+      ;
+    })
+  ;
+</script>
+
+<script>
+
+</script>
+
+
+
+</body>
+</html>

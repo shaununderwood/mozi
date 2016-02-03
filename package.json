@@ -1,0 +1,14 @@
+{
+  "name": "demo-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Shaun Underwood <shaun@sunderwood.co.uk>",
+  "license": "ISC",
+  "devDependencies": {
+    "http-server": "^0.8.5"
+  }
+}
