@@ -1,0 +1,8 @@
+{
+  "realm": "my-test-realm",
+  "realm-public-key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAimBUraOUfIgDgKI89ICsoauljieaMX0iNl9FXJG2KzFFn94mKS8BSuCSyjADNR4EZnhnlQXDfDOXmZhjAiiLr+JoO3wPYBoOk/lWoI2093I+KisZETa/Wm6FvyRHER16mMvnloNPZ1bKQEik5SFp3kmYNRf3svypy9PVYWUqJTSy0rg8KdK+lfBBhBBcyARrXBFWHO38aDmoPqeR0RTOs2Ar3f57gwmZgeN269JHgRXr5pGnOBzHBGfW9fLqTuRYEnmpVCLT/ZHjduje3o/B6rTHDoZKxWPRwKKNwUrJxlIx6pWWGeWegKxQvPBMk5NErIoPHRsHLK1N7Kr1keOidQIDAQAB",
+  "auth-server-url": "http://192.168.99.100:32769/auth",
+  "ssl-required": "external",
+  "resource": "my-test-client",
+  "public-client": true
+}

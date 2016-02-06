@@ -1,143 +1,221 @@
 <html>
 <head>
   <link rel="stylesheet" href="vendor/bootstrap/dist/css/bootstrap.css">
-
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.css">
 
   <title>Lawso</title>
 
+  <script src="http://192.168.99.100:32768/auth/js/keycloak.js"></script>
+  <script>
+    var keycloak = Keycloak('http://localhost:8001/keycloak.json');
+    keycloak
+        .init({
+          onLoad: 'login-required'
+        })
+        .success(function () {
+          //User has logged in
+          keycloak
+              .loadUserInfo( )
+              .success( function ( userInfo) {
+                // Bootstrap Angular
+                bootstrapAngular(keycloak, userInfo );
+              });
+        });
+    function bootstrapAngular( keycloak, userInfo) {
+      angular
+          .module( 'app')
+          .run( function ( $rootScope) {
+            // store the token in header's defaults or a cookie - we'll cover that with the backend in part 2
+
+            $rootScope.currentUser = {
+              username: userInfo.name || userInfo.preferred_username,
+              roles: keycloak.realmAccess.roles
+            };
+            console.log( $rootScope.currentUser);
+
+            $rootScope.userLogout = function () {
+              keycloak.logout();
+            };
+          });
+      angular.bootstrap(document, ['app']);
+    }
+  </script>
+
 </head>
-<body ng-app="app" ng-controller="Layout as layout">
+<body ng-controller="LayoutController as layout">
 
 
 <div ui-view></div>
 
-
+<pre>{{layout.$state.$current.includes}}</pre>
 <script type="text/ng-template" id="loggedout-main.html">
   <div class="vertical-center">
     <div class="container">
 
-      <form>
-        <div class="row">
-          <div class="col-xs-12">
-            <h1 class="text-center">LAWZO</h1>
-          </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <h1 class="text-center">LAWZO</h1>
         </div>
+      </div>
 
-        <div class="row">
-          <div class="col-xs-offset-4 col-xs-4">
-            <div class="text-center">
-              <h3>email</h3>
-            </div>
-          </div>
+      <div class="row">
+        <div class="col-xs-12 text-center">
+          <button ui-sref="loggedin" class="btn btn-lg btn-warning">Log In</button>
         </div>
+      </div>
 
-        <div class="row">
-          <div class="col-xs-offset-4 col-xs-4">
-            <input class="form-control input-group-lg" type="text" ng-model="ctrl.model.email" autofocus/>
-          </div>
+      <hr class="mostly-hidden" />
+
+      <div class="row">
+        <div class="col-xs-12 text-center">
+          <a href ui-sref="logout">Logout</a>
         </div>
+      </div>
 
-        <div class="row">
-          <div class="col-xs-offset-4 col-xs-4">
-            <div class="text-center">
-              <h3>password</h3>
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-xs-offset-4 col-xs-4">
-            <input class="form-control input-group-lg" type="password" ng-model="ctrl.model.password" />
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-xs-offset-4 col-xs-4">
-            <div class="text-center">
-              &nbsp;
-            </div>
-          </div>
-        </div>
-
-
-        <div class="row">
-          <div class="col-xs-4"></div>
-          <div class="col-xs-4">
-            <div class="pull-left ">
-              <a href="#">Forgotten Password</a>
-            </div>
-            <div class="pull-right">
-              <a ui-sref="loggedin" class="btn btn-lg btn-warning" >Log In</a>
-            </div>
-          </div>
-          <div class="col-xs-4"></div>
-        </div>
-
-        <div class="row">
-          <div class="col-xs-12"></div>
-        </div>
-        <div class="col-xs-12"></div>
-      </form>
     </div>
   </div>
 
 </script>
 
 <script type="text/ng-template" id="loggedin-main.html">
-<div class="row row-adjustment text-center">
-  <div class="col-xs-2">
-    <nav class="navbar">
-      <div style="background-color: black">
 
-        <header class="profile-menu-item"
-                ng-click="gotoState('loggedin.myprofile');"
-                ng-class="{selected:selected==='loggedin.myprofile'}">
-          <div style="height: 200px; padding-top:30px">
-            <img class="img-circle" src="img/default-profile-image.png" />
-          </div>
-          <p>
-            <span><b>Sam Smith</b></span>
-            <br>
-            <span class="text-muted">Manager</span>
-          </p>
-        </header>
+  <div class="row row-adjustment text-center">
+    <div class="col-xs-2">
 
-        <section>
+      <nav class="navbar">
+        <div style="background-color: black">
+
+          <header class="profile-menu-item"
+                  ng-click="layout.gotoState('loggedin.profile');"
+                  ng-class="{selected:layout.$state.$current.includes['loggedin.myprofile']}">
+            <div style="height: 200px; padding-top:30px">
+              <img class="img-circle" src="img/default-profile-image.png" />
+            </div>
+            <p>
+              <span><b>Sam Smith</b></span>
+              <br>
+              <span class="text-muted">Manager</span>
+            </p>
+          </header>
+
+          <section>
             <ul class="menu">
-              <li class="menu-item" ng-click="gotoState('loggedin.groups');"          ng-class="{selected:selected==='loggedin.groups'}">GROUPS</li>
-              <li class="menu-item" ng-click="gotoState('loggedin.timesheet');"       ng-class="{selected:selected==='loggedin.timesheet'}">TIMESHEET</li>
-              <li class="menu-item" ng-click="gotoState('loggedin.administration');"  ng-class="{selected:selected==='loggedin.administration'}">ADMINISTRATION</li>
+              <li ng-click="layout.gotoState('loggedin.groups');"          class="menu-item" ng-class="{selected:layout.$state.$current.includes['loggedin.groups']}">GROUPS</li>
+              <li ng-click="layout.gotoState('loggedin.timesheet');"       class="menu-item" ng-class="{selected:layout.$state.$current.includes['loggedin.timesheet']}">TIMESHEET</li>
+              <li ng-click="layout.gotoState('loggedin.administration');"  class="menu-item" ng-class="{selected:layout.$state.$current.includes['loggedin.administration']}">ADMINISTRATION</li>
             </ul>
-        </section>
+          </section>
 
-        <footer style="bottom:1px; position: absolute; text-align: center; width:100%">
-          <ul class="menu">
-            <li class="menu-item" ng-click="logout();">LOGOUT</li>
-          </ul>
-        </footer>
+          <footer style="bottom:1px; position: absolute; text-align: center; width:100%">
+            <ul class="menu">
+              <li class="menu-item" ng-click="layout.logout();">LOGOUT</li>
+            </ul>
+          </footer>
 
-      </div>
-    </nav>
+        </div>
+      </nav>
+
+    </div>
+
+    <div class="col-xs-10">
+      <div ui-view></div>
+    </div>
+
   </div>
 
-  <div class="col-xs-10">
-    <div ui-view></div>
-  </div>
 
-</div>
 </script>
 
 <script type="text/ng-template" id="loggedin-group.html">
-  <div class="container">
+  <section>
     <div class="row">
-      <div class="col-xs-12">
-        <div class="text-center">
-          <h1>Group</h1>
+      <div class="col-xs-6">
+        <div class="pull-left">
+          <h1><a><i class="glyphicon glyphicon-triangle-left"></i></a>Group</h1>
+          <button class="btn btn-sm btn-default">NEW</button>
         </div>
       </div>
+
+      <div class="col-xs-1"></div>
+      <div class="col-xs-3">
+        <h1>
+
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search..." />
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"><div><i class="glyphicon glyphicon-search glyph-remove-line-height"></i></div></button>
+              </span>
+          </div><!-- /input-group -->
+        </h1>
+      </div>
+      <div class="col-xs-2">
+        <h1>
+          <div class="input-group">
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"><div><i class="glyphicon glyphicon-th glyph-remove-line-height"></i></div></button>
+                <button type="button" class="btn btn-default"><div><i class="glyphicon glyphicon-th-list glyph-remove-line-height"></i></div></button>
+              </span>
+          </div><!-- /input-group -->
+
+        </h1>
+      </div><!-- /.col-lg-6 -->
+
     </div>
-  </div>
+
+    <hr class="mostly-hidden">
+
+    <div class="row" style="border-bottom: 1px grey solid; padding-bottom:10px;">
+      <div class="col-xs-3 text-left">
+        <span>Acme Group</span>
+      </div>
+      <div class="col-xs-6"></div>
+      <div class="col-xs-3 text-right">
+        <button class="btn btn-sm btn-default">NEW COMPANY</button>
+      </div>
+    </div>
+
+    <!--<hr>-->
+
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="matter-box">
+          <div class="line">
+            <span class="icon fa fa-university fa-2x"></span>
+            <span class="group">Acme Ltd</span>
+          </div>
+          <div class="line">
+            <span class="icon fa fa-list fa-2x"></span>
+            <span class="matter-count">10 Matters</span>
+          </div>
+        </div>
+
+        <div class="matter-box">
+          <div class="line">
+            <span class="icon fa fa-university fa-2x"></span>
+            <span class="group">Acme Ltd</span>
+          </div>
+          <div class="line">
+            <span class="icon fa fa-list fa-2x"></span>
+            <span class="matter-count">10 Matters</span>
+          </div>
+        </div>
+
+        <div class="matter-box">
+          <div class="line">
+            <span class="icon fa fa-university fa-2x"></span>
+            <span class="group">Acme Ltd</span>
+          </div>
+          <div class="line">
+            <span class="icon fa fa-list fa-2x"></span>
+            <span class="matter-count">10 Matters</span>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </section>
 </script>
 
 <script type="text/ng-template" id="loggedin-timesheet.html">
@@ -153,18 +231,63 @@
 </script>
 
 <script type="text/ng-template" id="loggedin-administration.html">
-  <div class="container">
-    <div class="row">
-      <div class="col-xs-12">
-        <div class="text-center">
-          <h1>Administration</h1>
-        </div>
+  <div class="row">
+    <div class="col-xs-6">
+      <div class="pull-left">
+        <h1><a><i class="glyphicon glyphicon-triangle-left"></i></a>Administration</h1>
       </div>
     </div>
   </div>
+
+  <hr class="mostly-hidden">
+
+  <div class="row">
+    <div class="col-xs-12">
+
+      <div class="admin-area-rail">
+
+        <div class="admin-area-box"
+             ng-class="{selected: layout.$state.$current.includes['loggedin.administration.groups']}"
+             ng-click="layout.gotoState('loggedin.administration.groups')">
+          <p><img class="img-circle" src="img/default-profile-image.png"></p>
+          <h3><span>Groups</span></h3>
+        </div>
+
+        <div class="admin-area-box"
+             ng-class="{selected: layout.$state.$current.includes['loggedin.administration.companies']}"
+             ng-click="layout.gotoState('loggedin.administration.companies')">
+          <p><img class="img-circle" src="img/default-profile-image.png"></p>
+          <h3><span>Companies</span></h3>
+        </div>
+
+        <div class="admin-area-box"
+             ng-class="{selected: layout.$state.$current.includes['loggedin.administration.employees']}"
+             ng-click="layout.gotoState('loggedin.administration.employees')">
+          <p><img class="img-circle" src="img/default-profile-image.png"></p>
+          <h3><span>Employees</span></h3>
+        </div>
+
+        <div class="admin-area-box"
+             ng-class="{selected: layout.$state.$current.includes['loggedin.administration.templates']}"
+             ng-click="layout.gotoState('loggedin.administration.templates')">
+          <p><img class="img-circle" src="img/default-profile-image.png"></p>
+          <h3><span>Templates</span></h3>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <div ui-view></div>
+    </div>
+  </div>
+
 </script>
 
-<script type="text/ng-template" id="loggedin-myprofile.html">
+<script type="text/ng-template" id="loggedin-profile.html">
   <div class="container">
     <div class="row">
       <div class="col-xs-12">
@@ -176,78 +299,80 @@
   </div>
 </script>
 
+<script type="text/ng-template" id="loggedin-administration-groups.html">
+
+  <div class="row">
+    <div class="col-xs-3">
+
+      <search-box></search-box>
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search..." />
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default"><div><i class="glyphicon glyphicon-search glyph-remove-line-height"></i></div></button>
+              </span>
+      </div><!-- /input-group -->
+
+    </div>
+    <div class="col-xs-6"></div>
+    <div class="col-xs-3 text-right">
+      <small-button></small-button>
+      <button class="btn btn-sm btn-default">NEW</button>
+    </div>
+  </div>
+
+  <hr class="mostly-hidden">
+
+  <table>
+    <thead>
+    <tr><td>Name</td></tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>
+        <span class="pull-left"  ng-bind="'Group Name'"></span>
+        <small-button></small-button>
+        <button class="btn btn-sm btn-default pull-right">EDIT</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</script>
+
+<script type="text/ng-template" id="loggedin-administration-companies.html">
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>TODO: A list of companies</h2>
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="loggedin-administration-employees.html">
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>TODO: A list of employees</h2>
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="loggedin-administration-templates.html">
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>TODO: A list of templates</h2>
+    </div>
+  </div>
+</script>
+
+
+
 <script src="vendor/jquery/dist/jquery.js"></script>
 <script src="vendor/angular/angular.js"></script>
 <script src="vendor/angular-ui-router/release/angular-ui-router.js"></script>
 
 
-<script>
-  angular
-    .module( 'app', [ 'ui.router'])
-    .controller( 'Layout', function Layout( $scope, $state){
 
-        $scope.logout = function( ){
-          $state.go( 'loggedout');
-        };
-
-        $scope.gotoState = function( targetState){
-          $scope.selected = targetState;
-          $state.go( targetState);
-        };
-
-      })
-    .config( function( $stateProvider, $urlRouterProvider) {
-      'use strict';
-      //
-      // For any unmatched url, redirect to /state1
-      $urlRouterProvider.otherwise( "/" );
-
-      $stateProvider
-        .state('loggedout', {
-          url: "/",
-          templateProvider: function ( $templateCache) {
-            return $templateCache.get( 'loggedout-main.html');
-          }})
-        .state('loggedin', {
-          url: "/main",
-          templateProvider: function ( $templateCache) {
-            return $templateCache.get( 'loggedin-main.html');
-          }})
-        .state('loggedin.groups', {
-          url: "/main/groups",
-          templateProvider: function ( $templateCache) {
-            return $templateCache.get( 'loggedin-group.html');
-          }})
-        .state('loggedin.timesheet', {
-          url: "/main/timesheet",
-          templateProvider: function ( $templateCache) {
-            return $templateCache.get( 'loggedin-timesheet.html');
-          }})
-        .state('loggedin.administration', {
-          url: "/main/administration",
-          templateProvider: function ( $templateCache) {
-            return $templateCache.get( 'loggedin-administration.html');
-          }})
-        .state('loggedin.user', {
-          url: "/main/user",
-          templateProvider: function ( $templateCache) {
-            return $templateCache.get( 'loggedin-user.html');
-          }})
-        .state('loggedin.myprofile', {
-          url: "/main/myprofile",
-          templateProvider: function ( $templateCache) {
-            return $templateCache.get( 'loggedin-myprofile.html');
-          }})
-      ;
-    })
-  ;
-</script>
-
-<script>
-
-</script>
-
-
+<script src="js/script.js"></script>
+<script src="keycloak-setup.js"></script>
 
 </body>
 </html>
