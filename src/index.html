@@ -8,12 +8,17 @@
 
   <script src="http://192.168.99.100:32768/auth/js/keycloak.js"></script>
   <script>
+    'use strict';
+
+
     var keycloak = Keycloak('http://localhost:8001/keycloak.json');
+    window.shaun = keycloak;
+
     keycloak
         .init({
           onLoad: 'login-required'
         })
-        .success(function () {
+        .success(function ( result) {
           //User has logged in
           keycloak
               .loadUserInfo( )
@@ -22,9 +27,16 @@
                 bootstrapAngular(keycloak, userInfo );
               });
         });
-    function bootstrapAngular( keycloak, userInfo) {
+    function bootstrapAngular( keyCloak, userInfo) {
+
+      let KeyCloakService = ( function (keyCloak){
+        return function( ){
+          return keyCloak;
+        }; })( keyCloak);
+
       angular
           .module( 'app')
+          .service( 'KeyCloakService', KeyCloakService)
           .run( function ( $rootScope) {
             // store the token in header's defaults or a cookie - we'll cover that with the backend in part 2
 
@@ -32,7 +44,6 @@
               username: userInfo.name || userInfo.preferred_username,
               roles: keycloak.realmAccess.roles
             };
-            console.log( $rootScope.currentUser);
 
             $rootScope.userLogout = function () {
               keycloak.logout();
@@ -48,7 +59,7 @@
 
 <div ui-view></div>
 
-<pre>{{layout.$state.$current.includes}}</pre>
+
 <script type="text/ng-template" id="loggedout-main.html">
   <div class="vertical-center">
     <div class="container">
@@ -337,6 +348,72 @@
     </tbody>
   </table>
 
+  <hr class="mostly-hidden">
+
+
+    <div class="modal-container">
+      <form>
+        <header>
+          <div class="row">
+            <div class="col-xs-6">
+              <div class="pull-left">
+                <h1><a><i class="fa fa-caret-left"></i></a>New Group</h1>
+              </div>
+            </div>
+            <div class="col-xs-6"></div>
+          </div>
+        </header>
+
+        <section class="text-left">
+          <div class="modal-line">
+            <div class="col-xs-4"><span class="modal-field-label">Name</span></div>
+            <div class="col-xs-8"><input type="text" class="form-control modal-field-label" /></div>
+          </div>
+          <div class="modal-line">
+            <div class="col-xs-4"><span class="modal-field-label">Group Name</span></div>
+            <div class="col-xs-8"><input type="text" class="form-control" /></div>
+          </div>
+          <div class="modal-line">
+            <div class="col-xs-4"><span class="modal-field-label">Address</span></div>
+            <div class="col-xs-8"> <input type="text" class="form-control" /></div>
+          </div>
+          <div class="modal-line">
+            <div class="col-xs-4"></div>
+            <div class="col-xs-8"> <input type="text" class="form-control" /></div>
+          </div>
+          <div class="modal-line">
+            <div class="col-xs-4"></div>
+            <div class="col-md-8"> <input type="text" class="form-control" /></div>
+          </div>
+          <div class="modal-line">
+            <div class="col-xs-4">Reference</div>
+            <div class="col-md-8"> <input type="text" class="form-control" /></div>
+          </div>
+          <div class="modal-line">
+            <div class="col-xs-4">Contact Number</div>
+            <div class="col-md-8"> <input type="text" class="form-control" /></div>
+          </div>
+        </section>
+
+        <footer>
+          <div class="modal-line">
+            <div class="col-xs-4"></div>
+            <div class="col-md-8">
+              <div class="row">
+                <div class="col-xs-1"></div>
+                <div class="col-xs-4"><button class="btn btn-default form-control">DISCARD</button></div>
+                <div class="col-xs-2"></div>
+                <div class="col-xs-4"><button class="btn btn-success form-control">SAVE</button></div>
+                <div class="col-xs-1"></div>
+              </div>
+            </div>
+          </div>
+        </footer>
+
+      </form>
+    </div>
+  </div>
+
 </script>
 
 <script type="text/ng-template" id="loggedin-administration-companies.html">
@@ -368,7 +445,8 @@
 <script src="vendor/jquery/dist/jquery.js"></script>
 <script src="vendor/angular/angular.js"></script>
 <script src="vendor/angular-ui-router/release/angular-ui-router.js"></script>
-
+<script src="vendor/angular-resource/angular-resource.js"></script>
+<script src="http://localhost:3000/api.js"></script>
 
 
 <script src="js/script.js"></script>

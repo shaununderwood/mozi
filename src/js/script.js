@@ -1,10 +1,12 @@
-( ()=>{
+( ( )=>{
   'use strict';
 
   angular
     .module( 'app', [
+      'ngResource',
       'ui.router',
-      'KeyCloak'
+      'KeyCloak',
+      'lbServices'
     ])
 
     .controller( 'LayoutController', LayoutController)
@@ -81,7 +83,6 @@
     vm.KeyCloakService = KeyCloakService;
     vm.$state = $state;
     vm.$rootScope = $rootScope;
-    window.shaun = $state;
   }
 
   LayoutController.prototype.initKeyCloak = function initKeyCloak( ){
@@ -106,4 +107,6 @@
     };
   }
 
-})();
+})( );
+
+
