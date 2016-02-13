@@ -2,21 +2,15 @@
   'use strict';
 
   angular
-    .module( 'app', [
-      'ngResource',
-      'ui.router',
-      'KeyCloak',
-      'lbServices'
-    ])
+    .module( 'app') // module definition moved to head of html document
 
-    .controller( 'LayoutController', LayoutController)
     .controller( 'ContentPaneController', ContentPaneController)
 
     .config( function( $stateProvider, $urlRouterProvider) {
       'use strict';
-      //
+
       // For any unmatched url, redirect to /state1
-      $urlRouterProvider.otherwise( '/' );
+      $urlRouterProvider.otherwise( '/');
 
       $stateProvider
         .state('loggedout', {
@@ -28,12 +22,21 @@
           url: '/main',
           templateProvider: function ( $templateCache) {
             return $templateCache.get( 'loggedin-main.html');
-          }})
+          },
+          controller: 'MenuController',
+          controllerAs: 'ctrl' })
         .state('loggedin.groups', {
           url: '/groups',
           templateProvider: function ( $templateCache) {
             return $templateCache.get( 'loggedin-group.html');
           }})
+
+        .state('loggedin.matters', {
+          url: '/matters',
+          templateProvider: function ( $templateCache) {
+            return $templateCache.get( 'loggedin-matters.html');
+          }})
+
         .state('loggedin.timesheet', {
           url: '/timesheet',
           templateProvider: function ( $templateCache) {
@@ -44,26 +47,59 @@
           templateProvider: function ( $templateCache) {
             return $templateCache.get( 'loggedin-administration.html');
           }})
+
         .state('loggedin.administration.groups', {
           url: '/groups',
+          controller: 'AdminGroupListController',
+          controllerAs: 'ctrl',
           templateProvider: function ( $templateCache) {
             return $templateCache.get( 'loggedin-administration-groups.html');
+          },
+          resolve: {
+            groupListData: [ 'Group', '$stateParams', '$q', ( Group, $stateParams, $q) => {
+              let $promise = Group.find({});
+              return $promise;
+            }]}
+        })
+        .state('loggedin.administration.groups.add', {
+          url: '/add',
+          controller: 'AdminGroupAddController',
+          controllerAs: 'ctrl',
+          templateProvider: function ( $templateCache) {
+            return $templateCache.get( 'loggedin-administration-groups-add.html');
+          }
+        })
+        .state('loggedin.administration.groups.edit', {
+          url: '/edit/:groupId',
+          controller: 'AdminGroupEditController',
+          controllerAs: 'ctrl',
+          resolve: {
+            GroupData: [ 'Group', '$stateParams', '$q', ( Group, $stateParams, $q) => {
+              let $promise = Group.findById({ id: $stateParams.groupId});
+              return $promise;
+            }]},
+          templateProvider: function ( $templateCache) {
+            return $templateCache.get( 'loggedin-administration-groups-edit.html');
           }})
+
         .state('loggedin.administration.companies', {
-          url: '/groups',
+          url: '/companies',
           templateProvider: function ( $templateCache) {
             return $templateCache.get( 'loggedin-administration-companies.html');
           }})
+
         .state('loggedin.administration.employees', {
           url: '/employees',
           templateProvider: function ( $templateCache) {
             return $templateCache.get( 'loggedin-administration-employees.html');
           }})
+
         .state('loggedin.administration.templates', {
           url: '/templates',
           templateProvider: function ( $templateCache) {
             return $templateCache.get( 'loggedin-administration-templates.html');
           }})
+
         .state('loggedin.user', {
           url: '/user',
           templateProvider: function ( $templateCache) {
@@ -74,31 +110,10 @@
           templateProvider: function ( $templateCache) {
             return $templateCache.get( 'loggedin-profile.html');
           }})
+
       ;
     })
   ;
-
-  function LayoutController( $scope, $state, $rootScope, KeyCloakService){
-    let vm = this;
-    vm.KeyCloakService = KeyCloakService;
-    vm.$state = $state;
-    vm.$rootScope = $rootScope;
-  }
-
-  LayoutController.prototype.initKeyCloak = function initKeyCloak( ){
-    let vm = this;
-    vm.KeyCloakService.initialise( );
-  };
-
-  LayoutController.prototype.logout = function initKeyCloak( ){
-    let vm = this;
-    vm.$rootScope.userLogout( );
-  };
-
-  LayoutController.prototype.gotoState = function gotoState( state){
-    let vm = this;
-    vm.$state.go( state);
-  };
 
 
   function ContentPaneController( ){

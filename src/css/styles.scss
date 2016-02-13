@@ -1,0 +1,276 @@
+$icon-font-path: "../vendor/bootstrap-sass/assets/fonts/bootstrap/";
+@import '../vendor/bootstrap-sass/assets/stylesheets/_bootstrap';
+@import "../vendor/font-awesome/scss/font-awesome";
+
+body {
+  background-color: maroon;
+  color: white;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 100;
+}
+
+.container input {
+  background-color: black !important;
+  color: white;
+}
+
+.vertical-center {
+  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+  min-height: 100vh; /* These two lines are counted as one :-)       */
+
+  display: flex;
+  align-items: center;
+}
+
+.navbar {
+  background-color: black;
+  height: 100%;
+  margin:0;
+  padding: 0;
+}
+
+.row.row-adjustment {
+  margin-right: 0;
+}
+
+ul.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+ul.menu li {
+  text-align: center;
+  line-height: 100px;
+  vertical-align: middle;
+  height:100px;
+}
+
+ul.menu a li.selected {
+  background-color: darkgrey;
+}
+li.selected {
+  background-color: darkgrey;
+}
+ul.menu li:hover{
+  background-color: grey;
+}
+
+
+.profile-menu-item:hover {
+  background-color: rosybrown;
+  color: white !important;
+
+}.profile-menu-item.selected {
+   background-color: rosybrown;
+   color: white !important;
+ }
+
+.glyph-remove-line-height {
+  line-height: inherit !important;
+}
+
+.matter-box {
+  padding:  20px;
+  margin:   20px;
+  border:   1px solid white;
+  float:    left;
+  position: relative;
+  background-color: steelblue;
+}
+.matter-box .line {
+  line-height: 3em
+}
+.matter-box .line .icon {
+  vertical-align: middle;
+  padding: 0 10px;
+}
+.matter-box .line .group, .matter-box .line .matter-count {
+  vertical-align: middle;
+}
+
+a, a:hover, a:visited {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+hr.mostly-hidden {
+  border-top-color: transparent;
+}
+
+admin-area-rail {
+
+  admin-area-box {
+
+    height: 200px;
+    width: 200px;
+    background-color: black;
+    padding: 30px 0 0 0;
+    float: left;
+    margin: 30px;
+
+    :hover {
+      background-color: grey;
+    }
+    .selected {
+      background-color: darkgrey;
+    }
+    img {
+      width: 100px;
+    }
+  }
+}
+
+.admin-area-box {
+  height: 200px;
+  width: 200px;
+  background-color: black;
+  padding:30px 0 0 0;
+  float: left;
+  margin: 30px;
+  cursor: pointer;
+}
+.admin-area-box:hover{
+  background-color: grey;
+}
+.admin-area-box.selected{
+  background-color: darkgrey ;
+}
+
+.admin-area-box img {
+  width: 100px;
+}
+
+.admin-area-rail {
+
+}
+
+table {
+  width: 100%;
+  border: 1px solid black;
+}
+table thead td {
+  width: 100%;
+  height:30px;
+  background: darkgrey;
+  padding: 10px;
+  color: black;
+}
+table tbody tr {
+  border-top: 1px black solid;
+}
+table tbody tr td {
+  background-color: white;
+  color: black;
+  width: 100%;
+  padding: 10px;
+}
+
+small-button {
+  @extend .btn;
+  @extend .btn-sm;
+  @extend .btn-default;
+}
+//backdrop {
+//  width: 100%;
+//  height: 100%;
+//  z-index: 50;
+//  background-color: black;
+//  position: fixed;
+//  top: 0;
+//  left: 0;
+//  opacity: 0.5;
+//}
+
+popup {
+  color: black;
+  width: 500px;
+  display: block;
+  position: absolute;
+  margin: 0 auto;
+  right: 35%;
+  top: -300px;
+  border: grey 1px solid;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  padding: 0px 20px 20px 20px;
+  box-shadow: 5px 5px 2px #888888;
+  background: beige;
+  z-index: 100;
+
+  popup-header {  @extend .row;  }
+  popup-footer {  @extend .row;  }
+  popup-body {
+    @extend .row;
+    text-align: left;
+  }
+
+  row {  @extend .row;  }
+  col-xs-1 {  @extend .col-xs-1;  }
+  col-xs-2 {  @extend .col-xs-2;  }
+  col-xs-3 {  @extend .col-xs-3;  }
+  col-xs-4 {  @extend .col-xs-4;  }
+  col-xs-5 {  @extend .col-xs-5;  }
+  col-xs-6 {  @extend .col-xs-6;  }
+  col-xs-7 {  @extend .col-xs-7;  }
+  col-xs-8 {  @extend .col-xs-8;  }
+  col-xs-9 {  @extend .col-xs-9;  }
+  col-xs-10 {  @extend .col-xs-10;  }
+  col-xs-11 {  @extend .col-xs-11;  }
+  col-xs-12 {  @extend .col-xs-12;  }
+
+  input:required, select:required, textarea:required {
+    background-color: mistyrose;
+  }
+
+}
+
+table {
+  .matter-label {
+    tr td {
+      width: 25%;
+    }
+    tr {
+      border: 2px;
+    }
+  }
+}
+
+.text-comment {
+  padding: 10px;
+  background: saddlebrown ;
+  border: 1px solid black;
+  margin-bottom: 5px;
+ }
+
+.matter-group-and-associates {
+  .icon {
+    width:40px;
+  }
+  .description{
+    width: 40px;
+    font-weight: 100;
+    font-size: large
+  }
+}
+
+.additional-info {
+  text-align: right;
+  .title {
+  }
+  .key-value {
+    padding: 7px;
+    display: inline-block;
+    background-color: brown;
+    .key {
+      font-weight: bold;
+    }
+    .value {
+      font-weight: 100;
+    }
+  }
+}

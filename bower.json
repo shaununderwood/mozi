@@ -17,12 +17,12 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "~3.3.6",
     "angular": "angularjs#~1.4.9",
     "jquery": "~2.2.0",
     "angular-ui-router": "^0.2.17",
     "font-awesome": "fontawesome#^4.5.0",
-    "angular-resource": "^1.5.0"
+    "angular-resource": "^1.5.0",
+    "bootstrap-sass": "^3.3.6"
   },
   "resolutions": {
     "angular": "1.5.0"

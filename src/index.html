@@ -1,57 +1,15 @@
 <html>
 <head>
-  <link rel="stylesheet" href="vendor/bootstrap/dist/css/bootstrap.css">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.css">
 
   <title>Lawso</title>
 
+  <script src="vendor/jquery/dist/jquery.js"></script>
+  <script src="vendor/angular/angular.js"></script>
   <script src="http://192.168.99.100:32768/auth/js/keycloak.js"></script>
-  <script>
-    'use strict';
-
-
-    var keycloak = Keycloak('http://localhost:8001/keycloak.json');
-    window.shaun = keycloak;
-
-    keycloak
-        .init({
-          onLoad: 'login-required'
-        })
-        .success(function ( result) {
-          //User has logged in
-          keycloak
-              .loadUserInfo( )
-              .success( function ( userInfo) {
-                // Bootstrap Angular
-                bootstrapAngular(keycloak, userInfo );
-              });
-        });
-    function bootstrapAngular( keyCloak, userInfo) {
-
-      let KeyCloakService = ( function (keyCloak){
-        return function( ){
-          return keyCloak;
-        }; })( keyCloak);
-
-      angular
-          .module( 'app')
-          .service( 'KeyCloakService', KeyCloakService)
-          .run( function ( $rootScope) {
-            // store the token in header's defaults or a cookie - we'll cover that with the backend in part 2
-
-            $rootScope.currentUser = {
-              username: userInfo.name || userInfo.preferred_username,
-              roles: keycloak.realmAccess.roles
-            };
-
-            $rootScope.userLogout = function () {
-              keycloak.logout();
-            };
-          });
-      angular.bootstrap(document, ['app']);
-    }
-  </script>
+  <script src="http://localhost:3000/lb-services.js"></script>
+  <script src="js/startup.js"></script>
 
 </head>
 <body ng-controller="LayoutController as layout">
@@ -72,7 +30,7 @@
 
       <div class="row">
         <div class="col-xs-12 text-center">
-          <button ui-sref="loggedin" class="btn btn-lg btn-warning">Log In</button>
+          <button ui-sref="loggedin" class="btn btn-lg btn-warning">Enter</button>
         </div>
       </div>
 
@@ -90,7 +48,6 @@
 </script>
 
 <script type="text/ng-template" id="loggedin-main.html">
-
   <div class="row row-adjustment text-center">
     <div class="col-xs-2">
 
@@ -104,17 +61,25 @@
               <img class="img-circle" src="img/default-profile-image.png" />
             </div>
             <p>
-              <span><b>Sam Smith</b></span>
+              <span><b ng-bind="ctrl.getNameAsText( )"></b></span>
               <br>
-              <span class="text-muted">Manager</span>
+              <span class="text-muted" ng-bind="ctrl.getRoleAsText( )"></span>
             </p>
           </header>
 
-          <section>
+          <section class="ng-cloak" ng-if="ctrl.isManager() || ctrl.isAdmin()">
             <ul class="menu">
-              <li ng-click="layout.gotoState('loggedin.groups');"          class="menu-item" ng-class="{selected:layout.$state.$current.includes['loggedin.groups']}">GROUPS</li>
-              <li ng-click="layout.gotoState('loggedin.timesheet');"       class="menu-item" ng-class="{selected:layout.$state.$current.includes['loggedin.timesheet']}">TIMESHEET</li>
-              <li ng-click="layout.gotoState('loggedin.administration');"  class="menu-item" ng-class="{selected:layout.$state.$current.includes['loggedin.administration']}">ADMINISTRATION</li>
+              <li ng-click="layout.gotoState('loggedin.groups');"         class="menu-item" ng-class="{selected:layout.$state.$current.includes['loggedin.groups']}">GROUPS</li>
+              <li ng-click="layout.gotoState('loggedin.matters');"        class="menu-item" ng-class="{selected:layout.$state.$current.includes['loggedin.timesheet']}">MATTERS</li>
+              <li ng-click="layout.gotoState('loggedin.timesheet');"      class="menu-item" ng-class="{selected:layout.$state.$current.includes['loggedin.timesheet']}">TIMESHEET</li>
+              <li ng-click="layout.gotoState('loggedin.administration');" class="menu-item" ng-class="{selected:layout.$state.$current.includes['loggedin.administration']}">ADMINISTRATION</li>
+            </ul>
+          </section>
+
+          <section class="ng-cloak" ng-if="ctrl.isAssociate()">
+            <ul class="menu">
+              <li ng-click="layout.gotoState('loggedin.myMatters');"          class="menu-item" ng-class="{selected:layout.$state.$current.includes['loggedin.groups']}">GROUPS</li>
+              <li ng-click="layout.gotoState('loggedin.myTimesheet');"       class="menu-item" ng-class="{selected:layout.$state.$current.includes['loggedin.timesheet']}">TIMESHEET</li>
             </ul>
           </section>
 
@@ -143,7 +108,7 @@
     <div class="row">
       <div class="col-xs-6">
         <div class="pull-left">
-          <h1><a><i class="glyphicon glyphicon-triangle-left"></i></a>Group</h1>
+          <h1><a ui-sref="^"><i class="glyphicon glyphicon-triangle-left"></i></a>Group</h1>
           <button class="btn btn-sm btn-default">NEW</button>
         </div>
       </div>
@@ -157,7 +122,7 @@
               <span class="input-group-btn">
                 <button type="button" class="btn btn-default"><div><i class="glyphicon glyphicon-search glyph-remove-line-height"></i></div></button>
               </span>
-          </div><!-- /input-group -->
+          </div>
         </h1>
       </div>
       <div class="col-xs-2">
@@ -167,10 +132,10 @@
                 <button type="button" class="btn btn-default"><div><i class="glyphicon glyphicon-th glyph-remove-line-height"></i></div></button>
                 <button type="button" class="btn btn-default"><div><i class="glyphicon glyphicon-th-list glyph-remove-line-height"></i></div></button>
               </span>
-          </div><!-- /input-group -->
+          </div>
 
         </h1>
-      </div><!-- /.col-lg-6 -->
+      </div>
 
     </div>
 
@@ -186,7 +151,6 @@
       </div>
     </div>
 
-    <!--<hr>-->
 
     <div class="row">
       <div class="col-xs-12">
@@ -241,63 +205,6 @@
   </div>
 </script>
 
-<script type="text/ng-template" id="loggedin-administration.html">
-  <div class="row">
-    <div class="col-xs-6">
-      <div class="pull-left">
-        <h1><a><i class="glyphicon glyphicon-triangle-left"></i></a>Administration</h1>
-      </div>
-    </div>
-  </div>
-
-  <hr class="mostly-hidden">
-
-  <div class="row">
-    <div class="col-xs-12">
-
-      <div class="admin-area-rail">
-
-        <div class="admin-area-box"
-             ng-class="{selected: layout.$state.$current.includes['loggedin.administration.groups']}"
-             ng-click="layout.gotoState('loggedin.administration.groups')">
-          <p><img class="img-circle" src="img/default-profile-image.png"></p>
-          <h3><span>Groups</span></h3>
-        </div>
-
-        <div class="admin-area-box"
-             ng-class="{selected: layout.$state.$current.includes['loggedin.administration.companies']}"
-             ng-click="layout.gotoState('loggedin.administration.companies')">
-          <p><img class="img-circle" src="img/default-profile-image.png"></p>
-          <h3><span>Companies</span></h3>
-        </div>
-
-        <div class="admin-area-box"
-             ng-class="{selected: layout.$state.$current.includes['loggedin.administration.employees']}"
-             ng-click="layout.gotoState('loggedin.administration.employees')">
-          <p><img class="img-circle" src="img/default-profile-image.png"></p>
-          <h3><span>Employees</span></h3>
-        </div>
-
-        <div class="admin-area-box"
-             ng-class="{selected: layout.$state.$current.includes['loggedin.administration.templates']}"
-             ng-click="layout.gotoState('loggedin.administration.templates')">
-          <p><img class="img-circle" src="img/default-profile-image.png"></p>
-          <h3><span>Templates</span></h3>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-xs-12">
-      <div ui-view></div>
-    </div>
-  </div>
-
-</script>
-
 <script type="text/ng-template" id="loggedin-profile.html">
   <div class="container">
     <div class="row">
@@ -310,110 +217,312 @@
   </div>
 </script>
 
+<script type="text/ng-template" id="loggedin-administration.html">
+  <div class="row">
+    <div class="col-xs-6">
+      <div class="pull-left">
+        <a ui-sref="^"><h1><i class="glyphicon glyphicon-triangle-left"></i>Administration</h1></a>
+      </div>
+    </div>
+  </div>
+
+  <hr class="mostly-hidden">
+
+  <div class="row">
+    <div class="col-xs-12">
+
+      <div class="admin-area-rail">
+
+        <div class="admin-area-box"
+             ui-sref="loggedin.administration.groups"
+             ng-class="{selected: layout.$state.$current.includes['loggedin.administration.groups']}">
+          <p><img class="img-circle" src="img/default-profile-image.png"></p>
+          <h3><span>Groups</span></h3>
+        </div>
+
+        <div class="admin-area-box"
+             ui-sref="loggedin.administration.companies"
+             ng-class="{selected: layout.$state.$current.includes['loggedin.administration.companies']}">
+          <p><img class="img-circle" src="img/default-profile-image.png"></p>
+          <h3><span>Companies</span></h3>
+        </div>
+
+        <div class="admin-area-box"
+             ui-sref="loggedin.administration.employees"
+             ng-class="{selected: layout.$state.$current.includes['loggedin.administration.employees']}">
+          <p><img class="img-circle" src="img/default-profile-image.png"></p>
+          <h3><span>Employees</span></h3>
+        </div>
+
+        <div class="admin-area-box"
+             ui-sref="loggedin.administration.templates"
+             ng-class="{selected: layout.$state.$current.includes['loggedin.administration.templates']}">
+          <p><img class="img-circle" src="img/default-profile-image.png"></p>
+          <h3><span>Templates</span></h3>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <div ui-view></div>
+    </div>
+  </div>
+
+</script>
+
 <script type="text/ng-template" id="loggedin-administration-groups.html">
 
   <div class="row">
     <div class="col-xs-3">
 
-      <search-box></search-box>
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search..." />
+      <search-box>
+        <div class="input-group">
+          <input type="text" class="form-control" ng-model="ctrl.model.searchFilter.groupName" placeholder="Search..." />
               <span class="input-group-btn">
-                <button type="button" class="btn btn-default"><div><i class="glyphicon glyphicon-search glyph-remove-line-height"></i></div></button>
+                <button type="button"
+                        ng-click="ctrl.updateList();"
+                        class="btn btn-default"><div><i class="glyphicon glyphicon-search glyph-remove-line-height"></i></div></button>
               </span>
-      </div><!-- /input-group -->
+        </div>
+      </search-box>
 
     </div>
     <div class="col-xs-6"></div>
-    <div class="col-xs-3 text-right">
-      <small-button></small-button>
-      <button class="btn btn-sm btn-default">NEW</button>
-    </div>
+    <div class="col-xs-3 text-right"></div>
   </div>
 
   <hr class="mostly-hidden">
 
   <table>
     <thead>
-    <tr><td>Name</td></tr>
+    <tr><td>
+      <span class="pull-left">Name</span>
+      <small-button class="pull-right"
+                    ng-click="ctrl.add( );">NEW</small-button>
+    </td></tr>
     </thead>
-    <tbody>
+    <tbody ng-repeat="group in ctrl.model.groupList | filter: { groupName: ctrl.model.searchFilter.groupName}">
     <tr>
       <td>
-        <span class="pull-left"  ng-bind="'Group Name'"></span>
-        <small-button></small-button>
-        <button class="btn btn-sm btn-default pull-right">EDIT</button>
+        <span class="pull-left"  ng-bind="group.groupName"></span>
+        <small-button class="pull-right"
+                      ng-click="ctrl.edit( group);">EDIT</small-button>
       </td>
     </tr>
     </tbody>
   </table>
 
-  <hr class="mostly-hidden">
+  <div ui-view></div>
 
+</script>
 
-    <div class="modal-container">
-      <form>
-        <header>
-          <div class="row">
-            <div class="col-xs-6">
-              <div class="pull-left">
-                <h1><a><i class="fa fa-caret-left"></i></a>New Group</h1>
-              </div>
-            </div>
-            <div class="col-xs-6"></div>
-          </div>
-        </header>
+<script type="text/ng-template" id="loggedin-administration-groups-add.html">
+  <popup>
+    <form ng-submit="ctrl.add( ctrl.model);">
 
-        <section class="text-left">
-          <div class="modal-line">
-            <div class="col-xs-4"><span class="modal-field-label">Name</span></div>
-            <div class="col-xs-8"><input type="text" class="form-control modal-field-label" /></div>
-          </div>
-          <div class="modal-line">
-            <div class="col-xs-4"><span class="modal-field-label">Group Name</span></div>
-            <div class="col-xs-8"><input type="text" class="form-control" /></div>
-          </div>
-          <div class="modal-line">
-            <div class="col-xs-4"><span class="modal-field-label">Address</span></div>
-            <div class="col-xs-8"> <input type="text" class="form-control" /></div>
-          </div>
-          <div class="modal-line">
-            <div class="col-xs-4"></div>
-            <div class="col-xs-8"> <input type="text" class="form-control" /></div>
-          </div>
-          <div class="modal-line">
-            <div class="col-xs-4"></div>
-            <div class="col-md-8"> <input type="text" class="form-control" /></div>
-          </div>
-          <div class="modal-line">
-            <div class="col-xs-4">Reference</div>
-            <div class="col-md-8"> <input type="text" class="form-control" /></div>
-          </div>
-          <div class="modal-line">
-            <div class="col-xs-4">Contact Number</div>
-            <div class="col-md-8"> <input type="text" class="form-control" /></div>
-          </div>
-        </section>
+      <popup-header>
+        <a ui-sref="^"><h3 class="pull-left"><i class="glyphicon glyphicon-triangle-left"></i> Add Group</h3></a>
+      </popup-header>
+      <popup-body>
+        <row>
+          <col-xs-4>
+            <label>id</label>
+          </col-xs-4>
+          <col-xs-8>
+            <span disabled class="form-control" ng-bind="ctrl.model.groupId"></span>
+          </col-xs-8>
+        </row>
 
-        <footer>
-          <div class="modal-line">
-            <div class="col-xs-4"></div>
-            <div class="col-md-8">
-              <div class="row">
-                <div class="col-xs-1"></div>
-                <div class="col-xs-4"><button class="btn btn-default form-control">DISCARD</button></div>
-                <div class="col-xs-2"></div>
-                <div class="col-xs-4"><button class="btn btn-success form-control">SAVE</button></div>
-                <div class="col-xs-1"></div>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <row>
+          <col-xs-4>
+            <label>Name</label>
+          </col-xs-4>
+          <col-xs-8>
+            <input type="text" class="form-control" ng-model="ctrl.model.groupName" autofocus required />
+          </col-xs-8>
+        </row>
 
-      </form>
-    </div>
-  </div>
+        <row>
+          <col-xs-4>
+            <label>Contact Name</label>
+          </col-xs-4>
+          <col-xs-8>
+            <input type="text" class="form-control" ng-model="ctrl.model.contactName" />
+          </col-xs-8>
+        </row>
 
+        <row>
+          <col-xs-4>
+            <label>Contact Number</label>
+          </col-xs-4>
+          <col-xs-8>
+            <input type="text" class="form-control" ng-model="ctrl.model.contactNumber" />
+          </col-xs-8>
+        </row>
+
+        <row>
+          <col-xs-4>
+            <label>Contact Address</label>
+          </col-xs-4>
+          <col-xs-8>
+            <textarea class="form-control" rows="5" ng-model="ctrl.model.contactAddress" />
+          </col-xs-8>
+        </row>
+
+        <row>
+          <col-xs-4>
+            <label>Referrer Name</label>
+          </col-xs-4>
+          <col-xs-8>
+            <input type="text" class="form-control" ng-model="ctrl.model.referrerName" />
+          </col-xs-8>
+        </row>
+
+        <row>
+          <col-xs-4>
+            <label>Referrer Contact</label>
+          </col-xs-4>
+          <col-xs-8>
+            <input type="text" class="form-control" ng-model="ctrl.model.referrerContact" />
+          </col-xs-8>
+        </row>
+
+      </popup-body>
+
+      <hr class="hidden-xs" />
+
+      <popup-footer>
+        <col-xs-6>
+          <button class="form-control btn btn-default" type="reset" ng-click="ctrl.cancel();">Cancel</button>
+        </col-xs-6>
+        <col-xs-6>
+          <button class="form-control btn btn-success" type="submit">Save</button>
+        </col-xs-6>
+      </popup-footer>
+    </form>
+  </popup>
+</script>
+
+<script type="text/ng-template" id="loggedin-administration-groups-edit.html">
+  <popup>
+    <form ng-submit="ctrl.save( ctrl.model);">
+
+      <popup-header>
+        <a ui-sref="^"><h3 class="pull-left"><i class="glyphicon glyphicon-triangle-left"></i> Edit Group</h3></a>
+      </popup-header>
+      <popup-body>
+        <row>
+          <col-xs-4>
+            <label>id</label>
+          </col-xs-4>
+          <col-xs-8>
+            <span disabled class="form-control" ng-bind="ctrl.model.groupId"></span>
+          </col-xs-8>
+        </row>
+
+        <row>
+          <col-xs-4>
+            <label>Name</label>
+          </col-xs-4>
+          <col-xs-8>
+            <input type="text" class="form-control" ng-model="ctrl.model.groupName" autofocus required />
+          </col-xs-8>
+        </row>
+
+        <row>
+          <col-xs-4>
+            <label>Contact Name</label>
+          </col-xs-4>
+          <col-xs-8>
+            <input type="text" class="form-control" ng-model="ctrl.model.contactName" />
+          </col-xs-8>
+        </row>
+
+        <row>
+          <col-xs-4>
+            <label>Contact Number</label>
+          </col-xs-4>
+          <col-xs-8>
+            <input type="text" class="form-control" ng-model="ctrl.model.contactNumber" />
+          </col-xs-8>
+        </row>
+
+        <row>
+          <col-xs-4>
+            <label>Contact Address</label>
+          </col-xs-4>
+          <col-xs-8>
+            <textarea class="form-control" rows="5" ng-model="ctrl.model.contactAddress" />
+          </col-xs-8>
+        </row>
+
+        <row>
+          <col-xs-4>
+            <label>Referrer Name</label>
+          </col-xs-4>
+          <col-xs-8>
+            <input type="text" class="form-control" ng-model="ctrl.model.referrerName" />
+          </col-xs-8>
+        </row>
+
+        <row>
+          <col-xs-4>
+            <label>Referrer Contact</label>
+          </col-xs-4>
+          <col-xs-8>
+            <input type="text" class="form-control" ng-model="ctrl.model.referrerContact" />
+          </col-xs-8>
+        </row>
+
+        <record-admin-info>
+          <row>
+            <col-xs-12>
+              <small-button ng-click="ctrl.semaphores.showAdminInfo = !ctrl.semaphores.showAdminInfo" ng-class="pull-left"> + </small-button>
+            </col-xs-12>
+          </row>
+
+          <record-detail ng-if="ctrl.semaphores.showAdminInfo" class="ng-scope">
+            <row>
+              <col-xs-4>
+                <label>Created by</label>
+              </col-xs-4>
+              <col-xs-8>
+                <span type="text" disabled="" class="form-control ng-binding" ng-bind="ctrl.model.createdByUserId"></span>
+              </col-xs-8>
+            </row>
+            <row>
+              <col-xs-4>
+                <label>Created on</label>
+              </col-xs-4>
+              <col-xs-8>
+                <span type="text" disabled="" class="form-control ng-binding" ng-bind="ctrl.model.timestampCreate"></span>
+              </col-xs-8>
+            </row>
+            <row>
+              <col-xs-4>
+                <label>Deactivated on</label>
+              </col-xs-4>
+              <col-xs-8>
+                <span type="text" disabled="" class="form-control ng-binding" ng-bind="ctrl.model.timestampDeactivate"></span>
+              </col-xs-8>
+            </row>
+          </record-detail>
+        </record-admin-info>
+
+      </popup-body>
+      <popup-footer>
+        <col-xs-6>
+          <button class="form-control btn btn-default" type="reset" ng-click="ctrl.cancel();">Cancel</button>
+        </col-xs-6>
+        <col-xs-6>
+          <button class="form-control btn btn-success" type="submit">Save</button>
+        </col-xs-6>
+      </popup-footer>
+    </form>
+  </popup>
 </script>
 
 <script type="text/ng-template" id="loggedin-administration-companies.html">
@@ -440,17 +549,126 @@
   </div>
 </script>
 
+<script type="text/ng-template" id="loggedin-matters.html">
+  <div class="row">
+    <div class="col-xs-6">
+      <div class="pull-left">
+        <a ui-sref="^"><h1><i class="glyphicon glyphicon-triangle-left"></i>Matters: Land Purchase</h1></a>
+      </div>
+    </div>
+  </div>
+
+  <hr class="mostly-hidden">
+
+  <div class="row text-left">
+    <div class="col-xs-3">
+      <p class="matter-group-and-associates">
+        <i class="fa fa-building fa-2x icon text-center"></i>
+        <span class="description">Acme Group, Acme Ltd</span>
+      </p>
+      <p class="matter-group-and-associates">
+        <i class="fa fa-group fa-2x icon text-center"></i>
+        <span class="description">Elston, Shaun, Tarun</span>
+        <small-button class="pull-right">EDIT</small-button>
+      </p>
+    </div>
+    <div class="col-xs-6"></div>
+    <div class="col-xs-3">
+      <div class="additional-info">
+        <p class="title">Additional Information</p>
+        <p class="key-value">
+            <span class="key">Court:</span>
+            <span class="value">Lorem ipsum</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="mostly-hidden">
+
+  <div class="row">
+    <div class="col-xs-3">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search..." />
+              <span class="input-group-btn">
+                <button ng-if="isManager()" type="button" class="btn btn-default"><div><i class="glyphicon glyphicon-search glyph-remove-line-height"></i></div></button>
+              </span>
+      </div>
+    </div>
+  </div>
+
+  <hr o-class="mostly-hidden">
+
+  <div class="row">
+    <!-- Task list -->
+    <div class="col-xs-6">
+      <task-list class="text-left" off-ng-repeat="task in ctrl.data.tasks">
+        <div class="row">
+          <div class="col-xs-1"><input class="form-control" type="checkbox" ng-model="ctrl.model"/> </div>
+          <div class="col-xs-10"><h4 style="text-decoration: line-through;">Task 1 - Find the khsdflvb</h4>  <span ng-bind="task.name"></span></div>
+          <div class="col-xs-1"><small-button ng-if="isManager()" class="pull-right">EDIT</small-button></div>
+        </div>
+        <div class="row">
+          <div class="col-xs-1"><input class="form-control" type="checkbox" /> </div>
+          <div class="col-xs-10"><h4>Task 2 - Find the khsdflvb</h4>  <span ng-bind="task.name"></span></div>
+          <div class="col-xs-1"><small-button ng-if="isManager()" class="pull-right">EDIT</small-button></div>
+        </div>
+        <div class="row">
+          <div class="col-xs-1"><input class="form-control" type="checkbox" /> </div>
+          <div class="col-xs-10"><h4>Task 3 - Find the khsdflvb</h4>  <span ng-bind="task.name"></span></div>
+          <div class="col-xs-1"><small-button ng-if="isManager()" class="pull-right">EDIT</small-button></div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-xs-4">
+            <small-button class="form-control">Show Strikethroughs</small-button>
+            <small-button class="form-control">Hide Strikethroughs</small-button>
+          </div>
+          <div class="col-xs-7"></div>
+          <div class="col-xs-1">
+            <small-button class="pull-right" ng-if="isManager()">ADD</small-button>
+          </div>
+        </div>
+      </task-list>
+    </div>
+
+    <!-- Task comments -->
+    <div class="col-xs-6 text-left">
+      <div class="text-comment">
+        <p>Last Updated: 13:01 12/12/2015 by Sam Smith<small-button ng-if="isManager()" class="pull-right">EDIT</small-button></p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </div>
+      <div class="text-comment">
+        <p>Last Updated: 13:01 12/12/2015 by Sam Smith<small-button ng-if="isManager()" class="pull-right">EDIT</small-button></p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </div>
+      <div class="text-comment-entry">
+        <textarea class="form-control"></textarea>
+        <p class="text-right">
+          <small-button type="reset">RESET</small-button>
+          <small-button type="submit">SUBMIT</small-button>
+        </p>
+      </div>
+    </div>
+  </div>
 
 
-<script src="vendor/jquery/dist/jquery.js"></script>
-<script src="vendor/angular/angular.js"></script>
+</script>
+
+
 <script src="vendor/angular-ui-router/release/angular-ui-router.js"></script>
 <script src="vendor/angular-resource/angular-resource.js"></script>
-<script src="http://localhost:3000/api.js"></script>
-
 
 <script src="js/script.js"></script>
 <script src="keycloak-setup.js"></script>
+
+<script src="js/AdminGroupList.controller.js"></script>
+<script src="js/AdminGroupAdd.controller.js"></script>
+<script src="js/AdminGroupEdit.controller.js"></script>
+<script src="js/AdminGroup.service.js"></script>
+<script src="js/Layout.controller.js"></script>
+<script src="js/Menu.controller.js"></script>
+
 
 </body>
 </html>

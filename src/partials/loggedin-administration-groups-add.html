@@ -1,0 +1,74 @@
+<popup>
+  <form ng-submit="ctrl.add( ctrl.model);">
+
+    <popup-header>
+      <h3>Add Group</h3>
+    </popup-header>
+    <popup-body>
+      <row>
+        <col-xs-4>
+          <label>id</label>
+        </col-xs-4>
+        <col-xs-8>
+          <span disabled class="form-control" ng-bind="ctrl.model.groupId"></span>
+        </col-xs-8>
+      </row>
+
+      <row>
+        <col-xs-4>
+          <label>Name</label>
+        </col-xs-4>
+        <col-xs-8>
+          <input type="text" class="form-control" ng-model="ctrl.model.groupName" autofocus required />
+        </col-xs-8>
+      </row>
+
+      <row>
+        <col-xs-4>
+          <label>Referrer Name</label>
+        </col-xs-4>
+        <col-xs-8>
+          <input type="text" class="form-control" ng-model="ctrl.model.referrerName" />
+        </col-xs-8>
+      </row>
+
+      <row>
+        <col-xs-4>
+          <label>Referrer Address</label>
+        </col-xs-4>
+        <col-xs-8>
+          <textarea class="form-control" rows="5" ng-model="ctrl.model.referrerAddress" />
+        </col-xs-8>
+      </row>
+
+      <row>
+        <col-xs-4>
+          <label>Referrer Contact Number</label>
+        </col-xs-4>
+        <col-xs-8>
+          <input type="text" class="form-control" ng-model="ctrl.model.referrerContactNumber" />
+        </col-xs-8>
+      </row>
+
+      <row>
+        <col-xs-4>
+          <label>Referrer Email</label>
+        </col-xs-4>
+        <col-xs-8>
+          <input type="text" class="form-control" ng-model="ctrl.model.referrerEmail" />
+        </col-xs-8>
+      </row>
+
+      <hr class="mostly-hidden" />
+
+    </popup-body>
+    <popup-footer>
+      <col-xs-6>
+        <button class="form-control btn btn-default" type="reset" ng-click="ctrl.cancel();">Cancel</button>
+      </col-xs-6>
+      <col-xs-6>
+        <button class="form-control btn btn-success" type="submit">Save</button>
+      </col-xs-6>
+    </popup-footer>
+  </form>
+</popup>
